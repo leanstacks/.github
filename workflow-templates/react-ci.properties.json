@@ -1,0 +1,7 @@
+{
+  "name": "LeanStacks React CI",
+  "description": "LeanStacks Organization React CI starter workflow.",
+  "iconName": "react-icon",
+  "categories": ["React"],
+  "filePatterns": ["package.json$"]
+}
