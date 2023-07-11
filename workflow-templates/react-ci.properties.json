@@ -3,6 +3,5 @@
   "description": "LeanStacks Organization React CI starter workflow.",
   "iconName": "react-icon",
   "categories": ["React", "JavaScript", "npm", "continuous-integration"],
-  "filePatterns": ["package.json$"],
-  "labels": ["preview"]
+  "filePatterns": ["package.json$"]
 }
