@@ -1,0 +1,81 @@
+# This workflow performs Continous Integration activities for a Serverless application
+#
+# To use this workflow, perform the following set-up steps:
+#
+# 1. Environment Variables -
+#    Set up the environment variables to obtain values from repo or organization variables or secrets.
+#    For example, ${{ vars.MY_REPO_VAR }} or ${{ secrets.MY_ORG_SECRET }}
+#
+# 2. AWS IAM Role ARN -
+#    Provide the AWS IAM Role ARN from your GitHub OIDC integration with AWS to allow
+#    this workflow to test packaging the Serverless application.
+#    See: https://github.com/marketplace/actions/configure-aws-credentials-for-github-actions
+#
+# 3. .nvmrc File
+#    Ensure that you have a .nvmrc file in the base repo directory.
+#    See: https://github.com/nvm-sh/nvm
+
+name: LeanStacks Serverless CI
+
+on:
+  pull_request:
+    branches: [$default-branch]
+
+env:
+  AWS_REGION: us-east-1 # set this to your AWS region
+  AWS_ROLE_ARN: arn:aws:iam::AWS-ACCOUNT-ID:role/AWS-IAM-ROLE-NAME # set this to your AWS IAM Role ARN
+
+jobs:
+  lint:
+    name: 'Lint'
+
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run lint
+
+  test:
+    name: 'Test'
+
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run test:ci
+
+  build:
+    name: 'Build'
+
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+      - run: npm ci
+      - name: 'Configure AWS credentials'
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ env.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+      - run: npm run package
