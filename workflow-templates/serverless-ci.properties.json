@@ -1,0 +1,7 @@
+{
+  "name": "LeanStacks Serverless Framework CI",
+  "description": "LeanStacks Organization Serverless Framework CI starter workflow.",
+  "iconName": "serverless-framework-icon",
+  "categories": ["JavaScript", "TypeScript", "npm", "continuous-integration"],
+  "filePatterns": ["serverless.yml$", "package.json$", ".nvmrc$"]
+}
