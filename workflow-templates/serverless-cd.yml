@@ -1,0 +1,96 @@
+# This workflow performs Continous Deployment activities for a Serverless Framework application.
+#
+# To use this workflow, perform the following set-up steps:
+#
+# 1. Environment Variables -
+#    Review the 'env' block.
+#    Update the environment variables to obtain values from repo, environment, or organization
+#    variables or secrets where applicable.
+#    For example, ${{ vars.MY_REPO_VAR }} or ${{ secrets.MY_ORG_SECRET }}
+#
+# 2. AWS IAM Role ARN -
+#    Provide the AWS IAM Role ARN from your GitHub OIDC integration with AWS to allow
+#    this workflow to test packaging the Serverless application.
+#    See: https://github.com/marketplace/actions/configure-aws-credentials-for-github-actions
+#
+# 3. .nvmrc File
+#    Ensure that you have a .nvmrc file in the base repo directory.
+#    See: https://github.com/nvm-sh/nvm
+#
+# 4. Environments & Concurrency -
+#    The job(s) specify a GitHub environment and concurrency group. Modify the values
+#    for your project if using environments. Remove if not using environments.
+#    See: https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment
+#
+
+name: LeanStacks Serverless Framework Application Deployment
+
+on:
+  push:
+    branches:
+      - [$default-branch]
+
+env:
+  AWS_ENV_CODE: dev # The AWS environment code. dev, qa, or prod
+  AWS_REGION: us-east-1 # The AWS region
+  AWS_ROLE_ARN: arn:aws:iam::AWS-ACCOUNT-ID:role/AWS-IAM-ROLE-NAME # The AWS role ARN which grants deployment privileges
+  ENV_CODE: DV # The environment code. DV, QA, or PR
+
+jobs:
+  deploy:
+    name: Deploy
+
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: production
+    concurrency: production
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Assess Changes
+        uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          filters: |
+            template:
+              - 'template.yml'
+
+      - name: Configure AWS Credentials
+        if: steps.changes.outputs.template == 'true'
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ env.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Deploy AWS Cloudformation Stack
+        uses: aws-actions/aws-cloudformation-github-deploy@v1
+        with:
+          name: ${{ format('ls-service-forecast-resources-{0}', inputs.AWS_ENV_CODE) }}
+          template: template.yml
+          no-fail-on-empty-changeset: 1
+          parameter-overrides: >-
+            EnvironmentCode=${{ env.ENV_CODE }}
+          tags:
+            - App: api.leanstacks.net
+            - Env: ${{ env.AWS_ENV_CODE }}
+            - OU: leanstacks
+            - Owner: Matthew Warman
+
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v3
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: 'Deploy Serverless Application'
+        run: |
+          npx sls deploy --stage ${{ env.AWS_ENV_CODE }} --verbose

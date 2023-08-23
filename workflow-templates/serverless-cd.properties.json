@@ -1,0 +1,7 @@
+{
+  "name": "Deploy Serverless Framework to AWS",
+  "description": "Deploy a Serverless Framework project to AWS.",
+  "iconName": "aws-icon",
+  "categories": ["JavaScript", "TypeScript", "npm", "deployment"],
+  "filePatterns": ["serverless.yml$", "package.json$", ".nvmrc$"]
+}
