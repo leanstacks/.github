@@ -31,10 +31,10 @@ on:
       - $default-branch
 
 env:
+  AWS_CFN_STACK_NAME_RESOURCES: ls-service-SERVICENAME-resources-ENVCODE # The AWS CloudFormation stack name for the resources
   AWS_ENV_CODE: dev # The AWS environment code. dev, qa, or prod
   AWS_REGION: us-east-1 # The AWS region
   AWS_ROLE_ARN: arn:aws:iam::AWS-ACCOUNT-ID:role/AWS-IAM-ROLE-NAME # The AWS role ARN which grants deployment privileges
-  ENV_CODE: DV # The environment code. DV, QA, or PR
 
 jobs:
   deploy:
@@ -53,16 +53,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Assess Changes
-        uses: dorny/paths-filter@v2
-        id: changes
-        with:
-          filters: |
-            template:
-              - 'template.yml'
-
       - name: Configure AWS Credentials
-        if: steps.changes.outputs.template == 'true'
         uses: aws-actions/configure-aws-credentials@v2
         with:
           role-to-assume: ${{ env.AWS_ROLE_ARN }}
@@ -71,11 +62,11 @@ jobs:
       - name: Deploy AWS Cloudformation Stack
         uses: aws-actions/aws-cloudformation-github-deploy@v1
         with:
-          name: ${{ format('ls-service-forecast-resources-{0}', inputs.AWS_ENV_CODE) }}
+          name: ${{ env.AWS_CFN_STACK_NAME_RESOURCES }}
           template: template.yml
           no-fail-on-empty-changeset: 1
           parameter-overrides: |-
-            EnvironmentCode=${{ env.ENV_CODE }}
+            EnvironmentCode=${{ env.AWS_ENV_CODE }}
           tags: |-
             [
               {"App": "api.leanstacks.net"},
@@ -88,11 +79,11 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version-file: '.nvmrc'
-          cache: 'npm'
+          cache: npm
 
       - name: Install Dependencies
         run: npm ci
 
-      - name: 'Deploy Serverless Application'
+      - name: Deploy Serverless Application
         run: |
           npx sls deploy --stage ${{ env.AWS_ENV_CODE }} --verbose
