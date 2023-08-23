@@ -28,7 +28,7 @@ name: LeanStacks Serverless Framework Application Deployment
 on:
   push:
     branches:
-      - [$default-branch]
+      - $default-branch
 
 env:
   AWS_ENV_CODE: dev # The AWS environment code. dev, qa, or prod
@@ -74,13 +74,15 @@ jobs:
           name: ${{ format('ls-service-forecast-resources-{0}', inputs.AWS_ENV_CODE) }}
           template: template.yml
           no-fail-on-empty-changeset: 1
-          parameter-overrides: >-
+          parameter-overrides: |-
             EnvironmentCode=${{ env.ENV_CODE }}
-          tags:
-            - App: api.leanstacks.net
-            - Env: ${{ env.AWS_ENV_CODE }}
-            - OU: leanstacks
-            - Owner: Matthew Warman
+          tags: |-
+            [
+              {"App": "api.leanstacks.net"},
+              {"Env": ${{ env.AWS_ENV_CODE }}},
+              {"OU": "leanstacks"},
+              {"Owner": "Matthew Warman"}
+            ]
 
       - name: Setup Node.js Environment
         uses: actions/setup-node@v3
