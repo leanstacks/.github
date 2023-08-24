@@ -1,4 +1,4 @@
-# This workflow performs Continous Deployment activities for a Serverless Framework application.
+# This workflow performs Continous Deployment activities for a React application.
 #
 # To use this workflow, perform the following set-up steps:
 #
@@ -23,7 +23,7 @@
 #    See: https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment
 #
 
-name: LeanStacks Serverless Framework Application Deployment
+name: Leanstacks React Application Deployment
 
 on:
   push:
@@ -31,17 +31,21 @@ on:
       - $default-branch
 
 env:
-  AWS_CFN_STACK_NAME_RESOURCES: ls-service-SERVICENAME-resources-ENVCODE # The AWS CloudFormation stack name for the resources
-  AWS_ENV_CODE: dev # The AWS environment code. dev, qa, or prod
-  AWS_REGION: us-east-1 # The AWS region
+  APP_NAME: app.leanstacks.net # The application name (AWS tags)
+  AWS_CFN_STACK_NAME_RESOURCES: ls-ui-APPNAME-resources-ENVCODE # The AWS CloudFormation stack name for the resources
+  AWS_CFN_TEMPLATE: template.yml # The AWS CloudFormation template file name or URI
+  AWS_ENV_CODE: dev # The AWS environment code, i.e. dev, qa, or prod.
+  AWS_REGION: us-east-1 # The AWS region into which the application will be deployed.
   AWS_ROLE_ARN: arn:aws:iam::AWS-ACCOUNT-ID:role/AWS-IAM-ROLE-NAME # The AWS role ARN which grants deployment privileges
+  ENV_FILE: ENV_DEV # Environment configuration key-value pairs. Repository secret.
+  S3_BUCKET_UI: ui-bucket-name # The AWS S3 bucket into which the application will be deployed.
 
 jobs:
   deploy:
     name: Deploy
 
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     environment: development
     concurrency: development
 
@@ -63,13 +67,13 @@ jobs:
         uses: aws-actions/aws-cloudformation-github-deploy@v1
         with:
           name: ${{ env.AWS_CFN_STACK_NAME_RESOURCES }}
-          template: template.yml
+          template: ${{ env.AWS_CFN_TEMPLATE }}
           no-fail-on-empty-changeset: 1
           parameter-overrides: |-
             EnvironmentCode=${{ env.AWS_ENV_CODE }}
           tags: |-
             [
-              {"App": "api.leanstacks.net"},
+              {"App": ${{ env.APP_NAME }}},
               {"Env": ${{ env.AWS_ENV_CODE }}},
               {"OU": "leanstacks"},
               {"Owner": "Matthew Warman"}
@@ -84,6 +88,20 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
-      - name: Deploy Serverless Application
+      - name: Create Job Metadata
+        id: metadata
         run: |
-          npx sls deploy --stage ${{ env.AWS_ENV_CODE }} --verbose
+          echo "JOB_DATE=$(date +'%Y%m%d')" >> "$GITHUB_OUTPUT"
+          echo "JOB_TIME=$(date +'%H%M%S')" >> "$GITHUB_OUTPUT"
+
+      - name: Create Environment Configuration
+        run: |
+          echo "${{ env.ENV_FILE }}" > .env
+          echo "REACT_APP_VERSION_ID=${{ format('{0}.{1}.{2}', steps.metadata.outputs.JOB_DATE, env.AWS_ENV_CODE, github.run_number) }}" >> .env
+
+      - name: Build
+        run: npm run build
+
+      - name: Deploy to AWS S3
+        run: |
+          aws s3 sync build s3://${{ env.S3_BUCKET_UI }} --delete
