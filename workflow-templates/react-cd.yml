@@ -33,7 +33,7 @@ on:
 env:
   APP_NAME: APPNAME.leanstacks.net # The application name (AWS tags)
   AWS_CFN_STACK_NAME_RESOURCES: ls-ui-APPNAME-resources-ENVCODE # The AWS CloudFormation stack name for the resources
-  AWS_CFN_TEMPLATE: template.yml # The AWS CloudFormation template file name or URI
+  AWS_CFN_TEMPLATE: template.yml # The AWS CloudFormation template file
   AWS_ENV_CODE: dev # The AWS environment code, i.e. dev, qa, or prod.
   AWS_REGION: us-east-1 # The AWS region into which the application will be deployed.
   AWS_ROLE_ARN: arn:aws:iam::AWS-ACCOUNT-ID:role/AWS-IAM-ROLE-NAME # The AWS role ARN which grants deployment privileges
