@@ -10,7 +10,7 @@
 #
 # 2. AWS IAM Role ARN -
 #    Provide the AWS IAM Role ARN from your GitHub OIDC integration with AWS to allow
-#    this workflow to test packaging the Serverless application.
+#    this workflow to deploy the application.
 #    See: https://github.com/marketplace/actions/configure-aws-credentials-for-github-actions
 #
 # 3. .nvmrc File
@@ -42,8 +42,8 @@ jobs:
 
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    environment: production
-    concurrency: production
+    environment: development
+    concurrency: development
 
     permissions:
       id-token: write
@@ -59,7 +59,7 @@ jobs:
           role-to-assume: ${{ env.AWS_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Deploy AWS Cloudformation Stack
+      - name: Deploy AWS CloudFormation Stack
         uses: aws-actions/aws-cloudformation-github-deploy@v1
         with:
           name: ${{ env.AWS_CFN_STACK_NAME_RESOURCES }}

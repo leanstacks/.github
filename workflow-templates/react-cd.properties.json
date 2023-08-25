@@ -1,0 +1,7 @@
+{
+  "name": "Deploy React to AWS",
+  "description": "Deploy a React project to AWS.",
+  "iconName": "aws-icon",
+  "categories": ["React", "JavaScript", "TypeScript", "npm", "deployment"],
+  "filePatterns": ["package.json$", ".nvmrc$", "template.yml$"]
+}
