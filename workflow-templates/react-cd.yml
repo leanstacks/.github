@@ -31,7 +31,7 @@ on:
       - $default-branch
 
 env:
-  APP_NAME: app.leanstacks.net # The application name (AWS tags)
+  APP_NAME: APPNAME.leanstacks.net # The application name (AWS tags)
   AWS_CFN_STACK_NAME_RESOURCES: ls-ui-APPNAME-resources-ENVCODE # The AWS CloudFormation stack name for the resources
   AWS_CFN_TEMPLATE: template.yml # The AWS CloudFormation template file name or URI
   AWS_ENV_CODE: dev # The AWS environment code, i.e. dev, qa, or prod.
@@ -64,20 +64,12 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Deploy AWS CloudFormation Stack
-        uses: aws-actions/aws-cloudformation-github-deploy@v1
-        with:
-          name: ${{ env.AWS_CFN_STACK_NAME_RESOURCES }}
-          template: ${{ env.AWS_CFN_TEMPLATE }}
-          no-fail-on-empty-changeset: 1
-          parameter-overrides: |-
-            EnvironmentCode=${{ env.AWS_ENV_CODE }}
-          tags: |-
-            [
-              {"App": ${{ env.APP_NAME }}},
-              {"Env": ${{ env.AWS_ENV_CODE }}},
-              {"OU": "leanstacks"},
-              {"Owner": "Matthew Warman"}
-            ]
+        run: |-
+          aws cloudformation deploy \
+          --stack-name ${{ env.AWS_CFN_STACK_NAME_RESOURCES }} \
+          --template-file ${{ env.AWS_CFN_TEMPLATE }} \
+          --parameter-overrides EnvironmentCode=${{ env.AWS_ENV_CODE }} \
+          --tags App=${{ env.APP_NAME }} Env=${{ env.AWS_ENV_CODE }} OU=leanstacks Owner='Matthew Warman'
 
       - name: Setup Node.js Environment
         uses: actions/setup-node@v3
