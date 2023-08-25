@@ -57,20 +57,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          role-to-assume: ${{ env.AWS_ROLE_ARN }}
-          aws-region: ${{ env.AWS_REGION }}
-
-      - name: Deploy AWS CloudFormation Stack
-        run: |-
-          aws cloudformation deploy \
-          --stack-name ${{ env.AWS_CFN_STACK_NAME_RESOURCES }} \
-          --template-file ${{ env.AWS_CFN_TEMPLATE }} \
-          --parameter-overrides EnvironmentCode=${{ env.AWS_ENV_CODE }} \
-          --tags App=${{ env.APP_NAME }} Env=${{ env.AWS_ENV_CODE }} OU=leanstacks Owner='Matthew Warman'
-
       - name: Setup Node.js Environment
         uses: actions/setup-node@v3
         with:
@@ -93,6 +79,20 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ env.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Deploy AWS CloudFormation Stack
+        run: |-
+          aws cloudformation deploy \
+          --stack-name ${{ env.AWS_CFN_STACK_NAME_RESOURCES }} \
+          --template-file ${{ env.AWS_CFN_TEMPLATE }} \
+          --parameter-overrides EnvironmentCode=${{ env.AWS_ENV_CODE }} \
+          --tags App=${{ env.APP_NAME }} Env=${{ env.AWS_ENV_CODE }} OU=leanstacks Owner='Matthew Warman'
 
       - name: Deploy to AWS S3
         run: |
