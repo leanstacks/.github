@@ -1,19 +1,22 @@
-:loudspeaker: **Instructions**
+:loudspeaker: **PR Guide**
 
+- Look for :sunglasses: for hints.
 - Begin with a **DRAFT** pull request.
-- Follow the instructions in each section providing detail to assist the reviewers.
+- Follow :sunglasses: instructions to add detail to assist the reviewers.
 - After completing the items in the **Checklist**, change the pull request to **Ready to Review**.
 
 ---
 
 ## :wrench: Change Summary
 
-:bulb: _List the changes included in this pull request._
+:sunglasses: _List the changes included in this pull request._
 
 - Issue: [ISSUE-123](https://example.com/ISSUE-123)
 - ...
 
-# :memo: Engineer's Checklist
+## :memo: Engineer's Checklist
+
+:sunglasses: _Engineers must complete the following tasks._
 
 [ ] Complete a self-review of changes  
 [ ] Unit tests have been created or updated  
