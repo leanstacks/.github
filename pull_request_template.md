@@ -2,7 +2,7 @@
 
 - Begin with a **DRAFT** pull request.
 - Follow _italicized instructions_ to add detail to assist the reviewers.
-- After completing all engineering checklist items, change the pull request to **READY**.
+- After completing all checklist items, change the pull request to **READY**.
 
 ---
 
@@ -13,9 +13,9 @@ _List the changes included in this pull request._
 - Issue: [ISSUE-123](https://example.com/ISSUE-123)
 - ...
 
-## :memo: Engineer's Checklist
+## :memo: Checklist
 
-_Engineers must complete the following tasks._
+_Pull request authors must complete the following tasks before marking the PR as ready to review._
 
 - [ ] Complete a self-review of changes
 - [ ] Unit tests have been created or updated
