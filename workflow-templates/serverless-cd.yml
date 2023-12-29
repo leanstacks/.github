@@ -2,23 +2,29 @@
 #
 # To use this workflow, perform the following set-up steps:
 #
-# 1. Environment Variables -
+# 1. Triggers -
+#    Review the 'on' block.
+#    Select the workflow trigger events appropriate for the target environment.
+#    Pushing to the default branch or tagging with 'dev' is a good trigger for the DEV environment.
+#    Publishing a release is a good trigger for the PROD environment.
+#
+# 2. Environment Variables -
 #    Review the 'env' block.
 #    Update the environment variables to obtain values from repo, environment, or organization
 #    variables or secrets where applicable.
 #    For example, ${{ vars.MY_REPO_VAR }} or ${{ secrets.MY_ORG_SECRET }}
 #
-# 2. AWS IAM Role ARN -
+# 3. AWS IAM Role ARN -
 #    Provide the AWS IAM Role ARN from your GitHub OIDC integration with AWS to allow
 #    this workflow to deploy the application.
 #    See: https://github.com/marketplace/actions/configure-aws-credentials-for-github-actions
 #
-# 3. .nvmrc File
+# 4. .nvmrc File
 #    Ensure that you have a .nvmrc file in the base repo directory.
 #    See: https://github.com/nvm-sh/nvm
 #
-# 4. Environments & Concurrency -
-#    The job(s) specify a GitHub environment and concurrency group. Modify the values
+# 5. Environments -
+#    The job(s) specify a GitHub environment. Modify the values
 #    for your project if using environments. Remove if not using environments.
 #    See: https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment
 #
@@ -29,6 +35,17 @@ on:
   push:
     branches:
       - $default-branch
+      - releases/*
+    tags:
+      - dev
+      - qa
+      - prod
+  release:
+    types:
+      - published
+
+concurrency:
+  group: ${{ github.workflow }}
 
 env:
   APP_NAME: APPNAME.leanstacks.net # The application name for AWS tags, e.g. api.leanstacks.net
@@ -45,7 +62,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     environment: development
-    concurrency: development
 
     permissions:
       id-token: write
@@ -53,10 +69,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Node.js Environment
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
           cache: npm
