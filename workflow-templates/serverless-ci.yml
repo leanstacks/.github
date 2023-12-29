@@ -21,25 +21,36 @@ on:
   pull_request:
     branches: [$default-branch]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   AWS_REGION: us-east-1 # set this to your AWS region
   AWS_ROLE_ARN: arn:aws:iam::AWS-ACCOUNT-ID:role/AWS-IAM-ROLE-NAME # set this to your AWS IAM Role ARN
 
 jobs:
-  lint:
-    name: 'Lint'
+  scan:
+    name: 'Scan'
 
     runs-on: ubuntu-latest
     timeout-minutes: 5
 
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
           cache: 'npm'
-      - run: npm ci
-      - run: npm run lint
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Linter
+        run: npm run lint
 
   test:
     name: 'Test'
@@ -48,13 +59,20 @@ jobs:
     timeout-minutes: 5
 
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
           cache: 'npm'
-      - run: npm ci
-      - run: npm run test:ci
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Unit Tests
+        run: npm run test:ci
 
   build:
     name: 'Build'
@@ -67,15 +85,23 @@ jobs:
       contents: read
 
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
           cache: 'npm'
-      - run: npm ci
-      - name: 'Configure AWS credentials'
-        uses: aws-actions/configure-aws-credentials@v2
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ env.AWS_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
-      - run: npm run package
+
+      - name: Build and Package
+        run: npm run package
