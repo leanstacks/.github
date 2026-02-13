@@ -1,12 +1,13 @@
 :mega: **Instructions**
 
-- Begin with a **DRAFT** pull request.
-- Follow _italicized instructions_ to add detail to assist the reviewers.
-- Complete **Author's Checklist** items before requesting review.
+- Authors complete the _Author's_ section. Use the _italicized instructions_ to add detail to assist the reviewers.
+- Create a **DRAFT** pull request.
+- After completing the _Author's Checklist_, authors may update the PR to **READY FOR REVIEW**.
+- Reviewers should complete the items in the _Reviewer's Checklist_ before approving the pull request.
 
 ---
 
-### :pushpin: Change Summary
+### Change Summary
 
 _AUTHOR: Describe the changes included in this pull request. Link to the associated [GitHub](https://docs.github.com/en/issues/tracking-your-work-with-issues/using-issues/linking-a-pull-request-to-an-issue#linking-a-pull-request-to-an-issue-using-a-keyword) or Jira issue(s)._
 
@@ -15,7 +16,7 @@ _AUTHOR: Describe the changes included in this pull request. Link to the associa
 - Updated the [...]
 - Fixed the [...]
 
-### :pushpin: Author's Checklist
+### Author's Checklist
 
 _AUTHOR: Complete the following tasks before marking the PR as **READY FOR REVIEW**._
 
@@ -25,7 +26,7 @@ _AUTHOR: Complete the following tasks before marking the PR as **READY FOR REVIE
 - [ ] Documentation has been updated as needed: README, /docs, code comments, JSDoc, etc.
 - [ ] All CI/CD checks pass
 
-### :pushpin Testing Instructions
+### Testing Instructions
 
 _AUTHOR: Describe the process to verify and test the changes in this pull request. Include steps for both happy path and edge cases._
 
@@ -35,7 +36,7 @@ _AUTHOR: Describe the process to verify and test the changes in this pull reques
 2. Click on [...]
 3. Verify that [...]
 
-### :pushpin: Additional Information
+### Additional Information
 
 _AUTHOR: Optionally, provide additional details, screenshots, screen recordings, or URLs that may assist the reviewer._
 
@@ -46,7 +47,7 @@ _AUTHOR: Optionally, provide additional details, screenshots, screen recordings,
 
 ---
 
-### :mag: Reviewer's Checklist
+### Reviewer's Checklist
 
 _REVIEWERS: Complete the following tasks before approving the PR._
 
